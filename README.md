@@ -1,6 +1,4 @@
-# myCV Flutter App
-
-Create your own resume in a minute.
+# MyCV Flutter App
 
 ![6](https://user-images.githubusercontent.com/76062686/139584481-bd127c06-aae4-4c97-8574-ecdf1270b354.jpg)
 ![7](https://user-images.githubusercontent.com/76062686/139584416-d8e31bd4-6087-4ead-9643-2143f5088920.jpg)
