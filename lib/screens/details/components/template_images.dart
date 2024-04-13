@@ -6,8 +6,8 @@ import '../../../size_config.dart';
 
 class TemplateImages extends StatefulWidget {
   const TemplateImages({
-    Key key,
-    @required this.template,
+    required Key key,
+    required this.template,
   }) : super(key: key);
 
   final Template template;
@@ -37,7 +37,7 @@ class _TemplateImagesState extends State<TemplateImages> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ...List.generate(widget.template.images.length,
-                    (index) => buildSmallTemplatePreview(index)),
+                (index) => buildSmallTemplatePreview(index)),
           ],
         )
       ],

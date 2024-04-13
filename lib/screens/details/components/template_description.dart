@@ -7,9 +7,9 @@ import '../../../size_config.dart';
 
 class TemplateDescription extends StatelessWidget {
   const TemplateDescription({
-    Key key,
-    @required this.template,
-    this.pressOnSeeMore,
+    required Key key,
+    required this.template,
+    required this.pressOnSeeMore,
   }) : super(key: key);
 
   final Template template;
@@ -27,10 +27,11 @@ class TemplateDescription extends StatelessWidget {
         SizedBox(height: 10),
         Padding(
           padding:
-          EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+              EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
           child: Text(
             template.title,
-            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 20),
+            style: TextStyle(
+                color: primaryColor, fontWeight: FontWeight.bold, fontSize: 20),
           ),
         ),
         SizedBox(height: 10),
@@ -50,18 +51,18 @@ class TemplateDescription extends StatelessWidget {
             padding: EdgeInsets.all(getProportionateScreenWidth(15)),
             width: getProportionateScreenWidth(64),
             decoration: BoxDecoration(
-              color: template.isFavourite
-                  ? Color(0xFFFFE6E6) : Color(0xFFF5F6F9),
+              color:
+                  template.isFavourite ? Color(0xFFFFE6E6) : Color(0xFFF5F6F9),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 bottomLeft: Radius.circular(20),
               ),
             ),
             child: SvgPicture.asset(
-                "assets/icons/heart.svg",
-                color: template.isFavourite
-                    ? Color(0xFFFF4848) : Color(0xFFDBDEE4),
-                height: getProportionateScreenWidth(16),
+              "assets/icons/heart.svg",
+              color:
+                  template.isFavourite ? Color(0xFFFF4848) : Color(0xFFDBDEE4),
+              height: getProportionateScreenWidth(16),
             ),
           ),
         ),

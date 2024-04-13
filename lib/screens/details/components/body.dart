@@ -12,28 +12,30 @@ import 'package:my_cv/screens/details/components/template_images.dart';
 class Body extends StatelessWidget {
   final Template template;
 
-  const Body({Key key, @required this.template}) : super(key: key);
+  const Body({required Key key, required this.template}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        TemplateImages(template: template),
+        TemplateImages(template: template, key: ValueKey(null),),
         TopRoundedContainer(
           color: Colors.white,
+          key: ValueKey(null),
           child: Column(
             children: [
               TemplateDescription(
                 template: template,
-                pressOnSeeMore: () {},
+                pressOnSeeMore: () {}, key: ValueKey(null),
               ),
               TopRoundedContainer(
                 color: Color(0xFFF6F7F9),
+                key: ValueKey(null),
                 child: Column(
                   children: [
-                    ColorDots(template: template),
                     TopRoundedContainer(
                       color: Colors.white,
+                      key: ValueKey(null),
                       child: Padding(
                         padding: EdgeInsets.only(
                           left: SizeConfig.screenWidth * 0.15,
@@ -45,7 +47,8 @@ class Body extends StatelessWidget {
                           text: "Use Template",
                           press: () {
                             if (template.id == 1) {
-                              Navigator.pushNamed(context, UseTemplateScreen.routeName);
+                              Navigator.pushNamed(
+                                  context, UseTemplateScreen.routeName);
                             }
                           },
                         ),

@@ -5,8 +5,8 @@ import '../size_config.dart';
 
 class SuffixIcon extends StatelessWidget {
   const SuffixIcon({
-    Key key,
-    @required this.svgIcon,
+    required Key key,
+    required this.svgIcon,
   }) : super(key: key);
 
   final String svgIcon;

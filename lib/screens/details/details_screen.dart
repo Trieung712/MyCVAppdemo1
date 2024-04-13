@@ -10,11 +10,11 @@ class DetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TemplateDetailsArguments agrs =
-        ModalRoute.of(context).settings.arguments;
+        ModalRoute.of(context)!.settings.arguments as TemplateDetailsArguments;
     return Scaffold(
       backgroundColor: Color(0xFFF5F6F9),
       appBar: CustomAppBar(rating: agrs.template.rating),
-      body: Body(template: agrs.template),
+      body: Body(template: agrs.template, key: ValueKey(null),),
     );
   }
 }
@@ -22,5 +22,5 @@ class DetailsScreen extends StatelessWidget {
 class TemplateDetailsArguments {
   final Template template;
 
-  TemplateDetailsArguments({@required this.template});
+  TemplateDetailsArguments({required this.template});
 }

@@ -8,11 +8,10 @@ class UseTemplateScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: backgroundColor,
-        title: Text("")
+      appBar: AppBar(backgroundColor: backgroundColor, title: Text("")),
+      body: Body(
+        key: ValueKey(null),
       ),
-      body: Body(),
     );
   }
 }

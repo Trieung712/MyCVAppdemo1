@@ -4,33 +4,35 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:my_cv/constants.dart';
 import 'package:my_cv/size_config.dart';
 
-class CustomAppBar extends PreferredSize {
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double rating;
-  bool isPressed = false;
 
-  CustomAppBar({@required this.rating});
-
-  @override
-  Size get preferredSize => Size.fromHeight(AppBar().preferredSize.height);
+  const CustomAppBar({required this.rating});
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
         padding:
-        EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+            EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
         child: Row(
           children: [
             SizedBox(
               height: getProportionateScreenWidth(40),
               width: getProportionateScreenWidth(40),
-              child: FlatButton(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(60),
-                ),
-                color: Colors.white,
-                padding: EdgeInsets.zero,
+              child: TextButton(
                 onPressed: () => Navigator.pop(context),
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(60),
+                    ),
+                  ),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                  padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      EdgeInsets.zero),
+                ),
                 child: SvgPicture.asset(
                   "assets/icons/back.svg",
                   height: 15,
@@ -58,12 +60,9 @@ class CustomAppBar extends PreferredSize {
                     icon: SvgPicture.asset(
                       "assets/icons/star.svg",
                       width: 25,
-                      color: isPressed == true
-                          ? primaryColor
-                          : Colors.black,
+                      color: Colors.black,
                     ),
-                    onPressed: () =>
-                        isPressed = !isPressed,
+                    onPressed: () {},
                   ),
                 ],
               ),
@@ -73,4 +72,7 @@ class CustomAppBar extends PreferredSize {
       ),
     );
   }
+
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }

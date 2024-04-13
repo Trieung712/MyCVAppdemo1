@@ -24,14 +24,14 @@ class _SignFormState extends State<SignForm> {
   bool remember = false;
   final List<String> errors = [];
 
-  void addError({String error}) {
+  void addError({required String error}) {
     if (!errors.contains(error))
       setState(() {
         errors.add(error);
       });
   }
 
-  void removeError({String error}) {
+  void removeError({required String error}) {
     if (errors.contains(error))
       setState(() {
         errors.remove(error);
@@ -55,7 +55,7 @@ class _SignFormState extends State<SignForm> {
                 activeColor: primaryColor,
                 onChanged: (value) {
                   setState(() {
-                    remember = value;
+                    remember = value!;
                   });
                 },
               ),
@@ -71,15 +71,18 @@ class _SignFormState extends State<SignForm> {
               )
             ],
           ),
-          FormError(errors: errors),
+          FormError(
+            errors: errors,
+            key: ValueKey(null),
+          ),
           SizedBox(height: getProportionateScreenHeight(20)),
           DefaultButton(
             text: "Continue",
             press: () async {
-              if (_formKey.currentState.validate()) {
-                _formKey.currentState.save();
-                dynamic result = await _auth.signInWithEmailAndPassword(
-                    email, password);
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState?.save();
+                dynamic result =
+                    await _auth.signInWithEmailAndPassword(email, password);
                 if (result != null) {
                   Navigator.pushNamed(context, HomeScreen.routeName);
                 } else {
@@ -97,7 +100,7 @@ class _SignFormState extends State<SignForm> {
   TextFormField buildPasswordFormField() {
     return TextFormField(
       obscureText: true,
-      onSaved: (newValue) => password = newValue,
+      onSaved: (newValue) => password = newValue!,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: passNullError);
@@ -107,7 +110,7 @@ class _SignFormState extends State<SignForm> {
         return null;
       },
       validator: (value) {
-        if (value.isEmpty) {
+        if (value!.isEmpty) {
           addError(error: passNullError);
           return "";
         } else if (value.length < 8) {
@@ -120,7 +123,10 @@ class _SignFormState extends State<SignForm> {
         labelText: "Password",
         hintText: "Enter your password",
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: SuffixIcon(svgIcon: "assets/icons/lock.svg"),
+        suffixIcon: SuffixIcon(
+          svgIcon: "assets/icons/lock.svg",
+          key: ValueKey(null),
+        ),
       ),
     );
   }
@@ -128,7 +134,7 @@ class _SignFormState extends State<SignForm> {
   TextFormField buildEmailFormField() {
     return TextFormField(
       keyboardType: TextInputType.emailAddress,
-      onSaved: (newValue) => email = newValue,
+      onSaved: (newValue) => email = newValue!,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: emailNullError);
@@ -138,7 +144,7 @@ class _SignFormState extends State<SignForm> {
         return null;
       },
       validator: (value) {
-        if (value.isEmpty) {
+        if (value!.isEmpty) {
           addError(error: emailNullError);
           return "";
         } else if (!emailValidatorRegExp.hasMatch(value)) {
@@ -151,7 +157,10 @@ class _SignFormState extends State<SignForm> {
         labelText: "Email",
         hintText: "Enter your email",
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: SuffixIcon(svgIcon: "assets/icons/mail.svg"),
+        suffixIcon: SuffixIcon(
+          svgIcon: "assets/icons/mail.svg",
+          key: ValueKey(null),
+        ),
       ),
     );
   }

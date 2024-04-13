@@ -13,7 +13,10 @@ class SavedScreen extends StatelessWidget {
         title: Text(""),
       ),
       body: Body(),
-      bottomNavigationBar: CustomBottomNavBar(selectedMenu: MenuState.saved),
+      bottomNavigationBar: CustomBottomNavBar(
+        selectedMenu: MenuState.saved,
+        key: ValueKey(null),
+      ),
     );
   }
 }

@@ -4,7 +4,11 @@ class User {
   final String gender;
   final String occupation;
 
-  User({ this.firstName, this.lastName, this.gender, this.occupation });
+  User(
+      {required this.firstName,
+      required this.lastName,
+      required this.gender,
+      required this.occupation});
 }
 
 class UserData {
@@ -14,5 +18,10 @@ class UserData {
   final String gender;
   final String occupation;
 
-  UserData({ this.uid, this.firstName, this.lastName, this.gender, this.occupation });
+  UserData(
+      {required this.uid,
+      required this.firstName,
+      required this.lastName,
+      required this.gender,
+      required this.occupation});
 }

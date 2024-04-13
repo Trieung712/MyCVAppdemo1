@@ -4,8 +4,8 @@ import 'package:my_cv/size_config.dart';
 
 class ColorDots extends StatelessWidget {
   const ColorDots({
-    Key key,
-    @required this.template,
+    required Key key,
+    required this.template,
   }) : super(key: key);
 
   final Template template;
@@ -15,15 +15,16 @@ class ColorDots extends StatelessWidget {
     int selectedColor = 3;
     return Padding(
       padding:
-      EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+          EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ...List.generate(
             template.colors.length,
-                (index) => ColorDot(
+            (index) => ColorDot(
               color: template.colors[index],
               isSelected: index == selectedColor,
+              key: ValueKey(null),
             ),
           ),
         ],
@@ -34,8 +35,8 @@ class ColorDots extends StatelessWidget {
 
 class ColorDot extends StatelessWidget {
   const ColorDot({
-    Key key,
-    @required this.color,
+    required Key key,
+    required this.color,
     this.isSelected = false,
   }) : super(key: key);
 
@@ -45,16 +46,15 @@ class ColorDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(right: 2),
-      padding: EdgeInsets.all(getProportionateScreenWidth(8)),
-      height: getProportionateScreenWidth(40),
-      width: getProportionateScreenWidth(40),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-        ),
-      )
-    );
+        margin: EdgeInsets.only(right: 2),
+        padding: EdgeInsets.all(getProportionateScreenWidth(8)),
+        height: getProportionateScreenWidth(40),
+        width: getProportionateScreenWidth(40),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ));
   }
 }

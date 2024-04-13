@@ -13,7 +13,7 @@ class Body extends StatelessWidget {
         width: double.infinity,
         child: Padding(
           padding:
-          EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+              EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -52,7 +52,9 @@ class Body extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: getProportionateScreenHeight(20)),
-                NoAccountText(),
+                NoAccountText(
+                  key: ValueKey(null),
+                ),
                 SizedBox(height: SizeConfig.screenHeight * 0.03),
               ],
             ),

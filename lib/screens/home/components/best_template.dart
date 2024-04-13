@@ -19,23 +19,17 @@ class BestTemplates extends StatelessWidget {
               "Templates",
               style: TextStyle(fontSize: 30),
             ),
-          )
+          ),
         ),
         SizedBox(height: getProportionateScreenWidth(10)),
-        SingleChildScrollView(
-          child: ListView(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            children: [
-              ...List.generate(
-                demoTemplates.length,
-                    (index) {
-                    return TemplateCard(template: demoTemplates[index]);
-                },
-              ),
-            ],
-          ),
-        )
+        ListView.builder(
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: demoTemplates.length,
+          itemBuilder: (context, index) {
+            return TemplateCard(template: demoTemplates[index], key: ValueKey(null),);
+          },
+        ),
       ],
     );
   }

@@ -18,15 +18,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<newUser>.value(
+    return StreamProvider<NewUser?>.value(
       value: AuthService().user,
+      initialData: null, // Provide initialData to avoid null error
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: theme(),
         home: SplashScreen(),
         routes: routes,
-      )
+      ),
     );
   }
 }

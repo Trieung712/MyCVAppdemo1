@@ -4,14 +4,15 @@ import '../size_config.dart';
 
 class RoundedIconBtn extends StatelessWidget {
   const RoundedIconBtn({
-    Key key,
-    @required this.icon,
-    @required this.press,
+    Key? key,
+    required this.icon,
+    required this.press,
     this.showShadow = false,
   }) : super(key: key);
 
   final IconData icon;
-  final GestureTapCancelCallback press;
+  final VoidCallback
+      press; // Sử dụng VoidCallback thay cho GestureTapCancelCallback
   final bool showShadow;
 
   @override
@@ -30,11 +31,15 @@ class RoundedIconBtn extends StatelessWidget {
             ),
         ],
       ),
-      child: FlatButton(
-        padding: EdgeInsets.zero,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+      child: TextButton(
+        // Sử dụng TextButton thay cho FlatButton
         onPressed: press,
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+          backgroundColor: Colors.white,
+        ),
         child: Icon(icon),
       ),
     );

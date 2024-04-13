@@ -8,7 +8,7 @@ import 'search_field.dart';
 
 class HomeHeader extends StatefulWidget {
   const HomeHeader({
-    Key key,
+    required Key key,
   }) : super(key: key);
 
   HomeHeaderState createState() => HomeHeaderState();
@@ -21,21 +21,22 @@ class HomeHeaderState extends State<HomeHeader> {
   Widget build(BuildContext context) {
     return Padding(
       padding:
-      EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+          EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SearchField(),
-          IconButton(
-            icon: SvgPicture.asset(
-              "assets/icons/logout.svg",
-              width: 25,
-            ),
-            onPressed: () async {
-              await _auth.signOut();
-              Navigator.pushNamed(context, SignInScreen.routeName);
-            }
+          SearchField(
+            key: ValueKey(null),
           ),
+          IconButton(
+              icon: SvgPicture.asset(
+                "assets/icons/logout.svg",
+                width: 25,
+              ),
+              onPressed: () async {
+                await _auth.signOut();
+                Navigator.pushNamed(context, SignInScreen.routeName);
+              }),
         ],
       ),
     );

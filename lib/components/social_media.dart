@@ -5,13 +5,13 @@ import '../size_config.dart';
 
 class SocialMedia extends StatelessWidget {
   const SocialMedia({
-    Key key,
-    this.icon,
-    this.press,
+    Key? key,
+    required this.icon,
+    required this.press,
   }) : super(key: key);
 
   final String icon;
-  final Function press;
+  final VoidCallback press; // Sử dụng VoidCallback thay cho Function
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class SocialMedia extends StatelessWidget {
       onTap: press,
       child: Container(
         margin:
-        EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(10)),
+            EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(10)),
         padding: EdgeInsets.all(getProportionateScreenWidth(12)),
         height: getProportionateScreenHeight(40),
         width: getProportionateScreenWidth(40),

@@ -8,7 +8,6 @@ import 'package:my_cv/screens/home/home_screen.dart';
 import 'package:my_cv/size_config.dart';
 import 'package:my_cv/services/auth.dart';
 
-
 class SignUpForm extends StatefulWidget {
   @override
   _SignUpFormState createState() => _SignUpFormState();
@@ -19,18 +18,18 @@ class _SignUpFormState extends State<SignUpForm> {
   final AuthService _auth = AuthService();
   String email = '';
   String password = '';
-  String confirmPassword;
+  late String confirmPassword;
   bool remember = false;
   final List<String> errors = [];
 
-  void addError({String error}) {
+  void addError({required String error}) {
     if (!errors.contains(error))
       setState(() {
         errors.add(error);
       });
   }
 
-  void removeError({String error}) {
+  void removeError({required String error}) {
     if (errors.contains(error))
       setState(() {
         errors.remove(error);
@@ -48,14 +47,18 @@ class _SignUpFormState extends State<SignUpForm> {
           buildPasswordFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
           buildConformPassFormField(),
-          FormError(errors: errors),
+          FormError(
+            errors: errors,
+            key: ValueKey(null),
+          ),
           SizedBox(height: getProportionateScreenHeight(40)),
           DefaultButton(
             text: "Continue",
             press: () async {
-              if (_formKey.currentState.validate()) {
-                _formKey.currentState.save();
-                dynamic result = await _auth.signUpWithEmailAndPassword(email, password);
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState?.save();
+                dynamic result =
+                    await _auth.signUpWithEmailAndPassword(email, password);
                 if (result == null) {
                   addError(error: "Error signing up");
                 } else {
@@ -74,7 +77,7 @@ class _SignUpFormState extends State<SignUpForm> {
   TextFormField buildConformPassFormField() {
     return TextFormField(
       obscureText: true,
-      onSaved: (newValue) => confirmPassword = newValue,
+      onSaved: (newValue) => confirmPassword = newValue!,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: passNullError);
@@ -84,7 +87,7 @@ class _SignUpFormState extends State<SignUpForm> {
         confirmPassword = value;
       },
       validator: (value) {
-        if (value.isEmpty) {
+        if (value!.isEmpty) {
           addError(error: passNullError);
           return "";
         } else if ((password != value)) {
@@ -97,7 +100,10 @@ class _SignUpFormState extends State<SignUpForm> {
         labelText: "Confirm password",
         hintText: "Re-enter your password",
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: SuffixIcon(svgIcon: "assets/icons/lock.svg"),
+        suffixIcon: SuffixIcon(
+          svgIcon: "assets/icons/lock.svg",
+          key: ValueKey(null),
+        ),
       ),
     );
   }
@@ -105,7 +111,7 @@ class _SignUpFormState extends State<SignUpForm> {
   TextFormField buildPasswordFormField() {
     return TextFormField(
       obscureText: true,
-      onSaved: (newValue) => password = newValue,
+      onSaved: (newValue) => password = newValue!,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: passNullError);
@@ -115,10 +121,10 @@ class _SignUpFormState extends State<SignUpForm> {
         password = value;
       },
       validator: (value) {
-        if (value.isEmpty) {
+        if (value!.isEmpty) {
           addError(error: passNullError);
           return "";
-        } else if (value.length < 8) {
+        } else if (value!.length < 8) {
           addError(error: shortPassError);
           return "";
         }
@@ -128,7 +134,10 @@ class _SignUpFormState extends State<SignUpForm> {
         labelText: "Password",
         hintText: "Enter your password",
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: SuffixIcon(svgIcon: "assets/icons/lock.svg"),
+        suffixIcon: SuffixIcon(
+          svgIcon: "assets/icons/lock.svg",
+          key: ValueKey(null),
+        ),
       ),
     );
   }
@@ -136,7 +145,7 @@ class _SignUpFormState extends State<SignUpForm> {
   TextFormField buildEmailFormField() {
     return TextFormField(
       keyboardType: TextInputType.emailAddress,
-      onSaved: (newValue) => email = newValue,
+      onSaved: (newValue) => email = newValue!,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: emailNullError);
@@ -146,7 +155,7 @@ class _SignUpFormState extends State<SignUpForm> {
         return null;
       },
       validator: (value) {
-        if (value.isEmpty) {
+        if (value!.isEmpty) {
           addError(error: emailNullError);
           return "";
         } else if (!emailValidatorRegExp.hasMatch(value)) {
@@ -159,7 +168,10 @@ class _SignUpFormState extends State<SignUpForm> {
         labelText: "Email",
         hintText: "Enter your email",
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: SuffixIcon(svgIcon: "assets/icons/mail.svg"),
+        suffixIcon: SuffixIcon(
+          svgIcon: "assets/icons/mail.svg",
+          key: ValueKey(null),
+        ),
       ),
     );
   }

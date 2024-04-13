@@ -19,13 +19,11 @@ class _BodyState extends State<Body> {
       "image": "assets/images/image0.png"
     },
     {
-      "text":
-      "Creating a resume has\nnever been easier.",
+      "text": "Creating a resume has\nnever been easier.",
       "image": "assets/images/image1.png"
     },
     {
-      "text":
-      "Browse through a large\ncatalogue of templates.",
+      "text": "Browse through a large\ncatalogue of templates.",
       "image": "assets/images/image2.png"
     },
   ];
@@ -46,8 +44,9 @@ class _BodyState extends State<Body> {
                 },
                 itemCount: splashData.length,
                 itemBuilder: (context, index) => SplashContent(
-                  image: splashData[index]["image"],
-                  text: splashData[index]['text'],
+                  image: "assets/images/work.png",
+                  text: "Hi $index",
+                  key: ValueKey(index),
                 ),
               ),
             ),
@@ -55,7 +54,7 @@ class _BodyState extends State<Body> {
               flex: 2,
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                    horizontal: getProportionateScreenWidth(20),
+                  horizontal: getProportionateScreenWidth(20),
                 ),
                 child: Column(
                   children: <Widget>[
@@ -65,7 +64,7 @@ class _BodyState extends State<Body> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
                         splashData.length,
-                            (index) => buildDot(index: index),
+                        (index) => buildDot(index: index),
                       ),
                     ),
                     Spacer(flex: 1),
@@ -86,7 +85,7 @@ class _BodyState extends State<Body> {
     );
   }
 
-  AnimatedContainer buildDot({int index}) {
+  AnimatedContainer buildDot({required int index}) {
     return AnimatedContainer(
       duration: animationDuration,
       margin: EdgeInsets.only(right: 5),

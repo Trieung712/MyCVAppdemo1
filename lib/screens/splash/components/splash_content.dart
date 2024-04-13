@@ -5,9 +5,9 @@ import 'package:my_cv/size_config.dart';
 
 class SplashContent extends StatelessWidget {
   const SplashContent({
-    Key key,
-    this.text,
-    this.image,
+    required Key key,
+    required this.text,
+    required this.image,
   }) : super(key: key);
   final String text, image;
 

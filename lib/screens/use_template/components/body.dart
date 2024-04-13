@@ -13,7 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatefulWidget {
-  Body({Key key}) : super(key: key);
+  Body({required Key key}) : super(key: key);
 
   @override
   _Body createState() => _Body();
@@ -71,8 +71,8 @@ class _Body extends State<Body> {
 
   PdfBrush theme = PdfBrushes.indianRed;
 
-  PickedFile _image;
-  String _imagePath;
+  late PickedFile _image;
+  late String _imagePath;
 
   void initState() {
     super.initState();
@@ -80,9 +80,10 @@ class _Body extends State<Body> {
   }
 
   Future _getImage() async {
-    var image = await ImagePicker().getImage(source: ImageSource.gallery);
+    var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+
     setState(() {
-      _image = image;
+      _image = image as PickedFile;
     });
   }
 
@@ -94,7 +95,7 @@ class _Body extends State<Body> {
   Future _loadImage() async {
     SharedPreferences saveImage = await SharedPreferences.getInstance();
     setState(() {
-      _imagePath = saveImage.getString("imagePath");
+      _imagePath = saveImage.getString("imagePath")!;
     });
   }
 
@@ -110,6 +111,7 @@ class _Body extends State<Body> {
     if (file.existsSync()) {
       fontBytes = await file.readAsBytes();
     }
+
     if (fontBytes != null && fontBytes.isNotEmpty) {
       //Return the google font
       return PdfTrueTypeFont(fontBytes, n);
@@ -716,22 +718,21 @@ class _Body extends State<Body> {
 
     //Draw the image in page rectangle clip bounds
     if (_image != null) {
-           PdfBitmap circle =
-               new PdfBitmap(File(_image.path).readAsBytesSync());
-           pageGraphics.drawImage(circle, const Rect.fromLTWH(40, 40, 130, 130));
+      PdfBitmap circle = new PdfBitmap(File(_image.path).readAsBytesSync());
+      pageGraphics.drawImage(circle, const Rect.fromLTWH(40, 40, 130, 130));
     }
 
 //Restore the graphics state
     pageGraphics.restore(state);
     //Save the document
-    List<int> bytes = document.save();
+    List<int> bytes = document.save() as List<int>;
 
     //Dispose the document
     document.dispose();
     final directory = await getExternalStorageDirectory();
 
 //Get directory path
-    final path = directory.path;
+    final path = directory?.path;
 
 //Create an empty file to write PDF data
     File file = File('$path/Output.pdf');
@@ -748,216 +749,131 @@ class _Body extends State<Body> {
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
+          child: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
                       begin: Alignment.topRight,
                       end: Alignment.bottomLeft,
-                      colors: [Color(0xFFfb0091).withOpacity(0.7), Color(0xFFffad87).withOpacity(0.7)]
+                      colors: [
+                        Color(0xFFfb0091).withOpacity(0.7),
+                        Color(0xFFffad87).withOpacity(0.7)
+                      ]),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
                     ),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
+                  ],
+                ),
+                child: Column(children: [
+                  Text(
+                    "Let's make a CV!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20),
                   ),
-                child: Column(
-                  children: [
-                    Text(
-                      "Let's make a CV!",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    SizedBox(
-                      height: 115,
-                      width: 115,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        clipBehavior: Clip.none,
-                        children: [
-                          _imagePath == null
-                              ? CircleAvatar(
-                              backgroundImage: _image == null
-                                  ? AssetImage("assets/images/avatar.png")
-                                  : FileImage(File(_image.path))
-                          )
-                              : CircleAvatar(backgroundImage: FileImage(File(_imagePath))),
-                          Positioned(
-                            right: -16,
-                            bottom: 0,
-                            child: SizedBox(
-                              height: 46,
-                              width: 46,
-                              child: FlatButton(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                  side: BorderSide(color: Colors.white),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  SizedBox(
+                    height: 115,
+                    width: 115,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      clipBehavior: Clip.none,
+                      children: [
+                        _imagePath == null
+                            ? CircleAvatar()
+                            : CircleAvatar(
+                                backgroundImage: FileImage(File(_imagePath))),
+                        Positioned(
+                          right: -16,
+                          bottom: 0,
+                          child: SizedBox(
+                            height: 46,
+                            width: 46,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                    side: BorderSide(color: Colors.white),
+                                  ),
                                 ),
-                                color: Color(0xFFF5F6F9),
-                                onPressed: () {
-                                  _getImage();
-                                  _saveImage(_image.path);
-                                },
-                                child: SvgPicture.asset("assets/icons/camera.svg"),
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Color(0xFFF5F6F9)),
                               ),
+                              onPressed: () {
+                                _getImage();
+                                _saveImage(_image.path);
+                              },
+                              child:
+                                  SvgPicture.asset("assets/icons/camera.svg"),
                             ),
-                          )
-                        ],
-                      ),
+                          ),
+                        )
+                      ],
                     ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      cursorColor: Colors.white,
-                      decoration: InputDecoration(
-                        hintText: "Enter your name",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          name = value;
-                        });
-                      },
-                    ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      cursorColor: Colors.white,
-                      decoration: InputDecoration(
-                        hintText: "Enter your occupation",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          job = value;
-                        });
-                      },
-                    ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      cursorColor: Colors.white,
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      maxLength: 200,
-                      decoration: InputDecoration(
-                        hintText: "Describe yourself",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          descri = value;
-                        });
-                      },
-                    ),
-                  ]
-                )
-              ),
-              SizedBox(height: 40),
-              Text(
-                "Professional\nExperience",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
                   ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Title",
-                        hintText: "Enter an experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          p_ex1 = value;
-                        });
-                      },
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    cursorColor: Colors.white,
+                    decoration: InputDecoration(
+                      hintText: "Enter your name",
                     ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        hintText: "Describe this experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          d_ex1 = value;
-                        });
-                      },
-                    ),
-                  ]
-                )
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        name = value;
+                      });
+                    },
                   ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Title",
-                        hintText: "Enter your experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          p_ex2 = value;
-                        });
-                      },
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    cursorColor: Colors.white,
+                    decoration: InputDecoration(
+                      hintText: "Enter your occupation",
                     ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        hintText: "Describe this experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          d_ex2 = value;
-                        });
-                      },
+                    onChanged: (value) {
+                      setState(() {
+                        job = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    cursorColor: Colors.white,
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    maxLength: 200,
+                    decoration: InputDecoration(
+                      hintText: "Describe yourself",
                     ),
-                  ]
-                )
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
+                    onChanged: (value) {
+                      setState(() {
+                        descri = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: 40),
+            Text(
+              "Professional\nExperience",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
+            ),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -971,89 +887,35 @@ class _Body extends State<Body> {
                     ),
                   ],
                 ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Title",
-                        hintText: "Enter your experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          p_ex3 = value;
-                        });
-                      },
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: "Title",
+                      hintText: "Enter an experience",
                     ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        hintText: "Describe this experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          d_ex3 = value;
-                        });
-                      },
-                    ),
-                  ]
-                )
-              ),
-              SizedBox(height: 40),
-              Text(
-                "Education",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        p_ex1 = value;
+                      });
+                    },
                   ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Title",
-                        hintText: "Enter your experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          e_ex1 = value;
-                        });
-                      },
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      hintText: "Describe this experience",
                     ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        hintText: "Describe this experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          de_ex1 = value;
-                        });
-                      },
-                    ),
-                  ]
-                )
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
+                    onChanged: (value) {
+                      setState(() {
+                        d_ex1 = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -1067,147 +929,272 @@ class _Body extends State<Body> {
                     ),
                   ],
                 ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Title",
-                        hintText: "Enter your experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          e_ex2 = value;
-                        });
-                      },
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: "Title",
+                      hintText: "Enter your experience",
                     ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        hintText: "Describe this experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          de_ex2 = value;
-                        });
-                      },
-                    ),
-                  ]
-                )
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        p_ex2 = value;
+                      });
+                    },
                   ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Title",
-                        hintText: "Enter your experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          e_ex3 = value;
-                        });
-                      },
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      hintText: "Describe this experience",
                     ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        hintText: "Describe this experience",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          de_ex3 = value;
-                        });
-                      },
-                    ),
-                  ]
-                )
-              ),
-              SizedBox(height: 40),
-              Text(
-                "Extracurricular\nActivities",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        d_ex2 = value;
+                      });
+                    },
                   ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Title",
-                        hintText: "Enter an activity",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          h_ex1 = value;
-                        });
-                      },
+                ])),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
                     ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        hintText: "Describe this activity",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          hd_ex1 = value;
-                        });
-                      },
+                  ],
+                ),
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: "Title",
+                      hintText: "Enter your experience",
                     ),
-                  ]
-                )
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        p_ex3 = value;
+                      });
+                    },
                   ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      hintText: "Describe this experience",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        d_ex3 = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: 40),
+            Text(
+              "Education",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
+            ),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: "Title",
+                      hintText: "Enter your experience",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        e_ex1 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      hintText: "Describe this experience",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        de_ex1 = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: "Title",
+                      hintText: "Enter your experience",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        e_ex2 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      hintText: "Describe this experience",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        de_ex2 = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: "Title",
+                      hintText: "Enter your experience",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        e_ex3 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      hintText: "Describe this experience",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        de_ex3 = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: 40),
+            Text(
+              "Extracurricular\nActivities",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
+            ),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: "Title",
+                      hintText: "Enter an activity",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        h_ex1 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      hintText: "Describe this activity",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        hd_ex1 = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
                 child: Column(
                   children: [
                     TextFormField(
@@ -1236,473 +1223,463 @@ class _Body extends State<Body> {
                       },
                     ),
                   ],
-                )
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Title",
-                        hintText: "Enter an activity",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          h_ex3 = value;
-                        });
-                      },
+                )),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
                     ),
-                    SizedBox(height: SizeConfig.screenHeight * 0.02),
-                    TextFormField(
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        hintText: "Describe this activity",
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          hd_ex3 = value;
-                        });
-                      },
+                  ],
+                ),
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: "Title",
+                      hintText: "Enter an activity",
                     ),
-                  ]
-                )
-              ),
-              SizedBox(height: 40),
-              Text(
-                "Languages",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        h_ex3 = value;
+                      });
+                    },
                   ),
-                  child: Column(
-                      children: [
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter a language",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              lang1 = value;
-                            });
-                          },
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter a language",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              lang2 = value;
-                            });
-                          },
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter a language",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              lang3 = value;
-                            });
-                          },
-                        ),
-                      ]
-                  )
-              ),
-              SizedBox(height: 40),
-              Text(
-                "Hobbies",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                      children: [
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter a hobby",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              hobby1 = value;
-                            });
-                          },
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter a hobby",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              hobby2 = value;
-                            });
-                          },
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter a hobby",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              hobby3 = value;
-                            });
-                          },
-                        ),
-                      ]
-                  )
-              ),
-              SizedBox(height: 40),
-              Text(
-                "Skills",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                      children: [
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter a skill",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              comp1 = value;
-                            });
-                          },
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter a skill",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              comp2 = value;
-                            });
-                          },
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter a skill",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              comp3 = value;
-                            });
-                          },
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter a skill",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              comp4 = value;
-                            });
-                          },
-                        ),
-                      ]
-                  )
-              ),
-              SizedBox(height: 40),
-              Text(
-                "Contact",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                      children: [
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter your email",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              email = value;
-                            });
-                          },
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Paste your linkedin URL",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              lkdin = value;
-                            });
-                          },
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter your phone number",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              tel = value;
-                            });
-                          },
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: "Enter your city",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              city = value;
-                            });
-                          },
-                        ),
-                      ]
-                  )
-              ),
-              SizedBox(height: 40),
-              Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                        colors: [Color(0xFFfb0091).withOpacity(0.7), Color(0xFFffad87).withOpacity(0.7)]
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      hintText: "Describe this activity",
                     ),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        hd_ex3 = value;
+                      });
+                    },
                   ),
-                  child: Column(
-                      children: [
-                        Text(
-                          "Pick a color",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        SizedBox(height: SizeConfig.screenHeight * 0.02),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            GestureDetector(
-                              child: Container(
-                                  margin: EdgeInsets.only(right: 2),
-                                  padding: EdgeInsets.all(getProportionateScreenWidth(8)),
-                                  height: getProportionateScreenWidth(40),
-                                  width: getProportionateScreenWidth(40),
-                                  decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    border: Border.all(color: isSelected1 ? primaryColor : Colors.transparent),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFCD5C5C),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  )
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  isSelected1 = !isSelected1;
-                                  isSelected4 = false;
-                                  isSelected2 = false;
-                                  isSelected3 = false;
-                                  theme = PdfBrushes.indianRed;
-                                });
-                              }
+                ])),
+            SizedBox(height: 40),
+            Text(
+              "Languages",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
+            ),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter a language",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        lang1 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter a language",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        lang2 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter a language",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        lang3 = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: 40),
+            Text(
+              "Hobbies",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
+            ),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter a hobby",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        hobby1 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter a hobby",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        hobby2 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter a hobby",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        hobby3 = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: 40),
+            Text(
+              "Skills",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
+            ),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter a skill",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        comp1 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter a skill",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        comp2 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter a skill",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        comp3 = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter a skill",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        comp4 = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: 40),
+            Text(
+              "Contact",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 30, fontWeight: FontWeight.bold, color: textColor),
+            ),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter your email",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        email = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Paste your linkedin URL",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        lkdin = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter your phone number",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        tel = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Enter your city",
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        city = value;
+                      });
+                    },
+                  ),
+                ])),
+            SizedBox(height: 40),
+            Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                      colors: [
+                        Color(0xFFfb0091).withOpacity(0.7),
+                        Color(0xFFffad87).withOpacity(0.7)
+                      ]),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(children: [
+                  Text(
+                    "Pick a color",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(height: SizeConfig.screenHeight * 0.02),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    GestureDetector(
+                        child: Container(
+                            margin: EdgeInsets.only(right: 2),
+                            padding:
+                                EdgeInsets.all(getProportionateScreenWidth(8)),
+                            height: getProportionateScreenWidth(40),
+                            width: getProportionateScreenWidth(40),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              border: Border.all(
+                                  color: isSelected1
+                                      ? primaryColor
+                                      : Colors.transparent),
+                              shape: BoxShape.circle,
                             ),
-                            GestureDetector(
-                              child: Container(
-                                  margin: EdgeInsets.only(right: 2),
-                                  padding: EdgeInsets.all(getProportionateScreenWidth(8)),
-                                  height: getProportionateScreenWidth(40),
-                                  width: getProportionateScreenWidth(40),
-                                  decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    border: Border.all(color: isSelected2 ? primaryColor : Colors.transparent),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFF008080),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  )
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Color(0xFFCD5C5C),
+                                shape: BoxShape.circle,
                               ),
-                                onTap: () {
-                                setState(() {
-                                  isSelected2 = !isSelected2;
-                                  isSelected1 = false;
-                                  isSelected4 = false;
-                                  isSelected3 = false;
-                                  theme = PdfBrushes.teal;
-                                });
-                              }
+                            )),
+                        onTap: () {
+                          setState(() {
+                            isSelected1 = !isSelected1;
+                            isSelected4 = false;
+                            isSelected2 = false;
+                            isSelected3 = false;
+                            theme = PdfBrushes.indianRed;
+                          });
+                        }),
+                    GestureDetector(
+                        child: Container(
+                            margin: EdgeInsets.only(right: 2),
+                            padding:
+                                EdgeInsets.all(getProportionateScreenWidth(8)),
+                            height: getProportionateScreenWidth(40),
+                            width: getProportionateScreenWidth(40),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              border: Border.all(
+                                  color: isSelected2
+                                      ? primaryColor
+                                      : Colors.transparent),
+                              shape: BoxShape.circle,
                             ),
-                            GestureDetector(
-                              child: Container(
-                                  margin: EdgeInsets.only(right: 2),
-                                  padding: EdgeInsets.all(getProportionateScreenWidth(8)),
-                                  height: getProportionateScreenWidth(40),
-                                  width: getProportionateScreenWidth(40),
-                                  decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    border: Border.all(color: isSelected3 ? primaryColor : Colors.transparent),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFF800080),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  )
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Color(0xFF008080),
+                                shape: BoxShape.circle,
                               ),
-                                onTap: () {
-                                setState(() {
-                                  isSelected3 = !isSelected3;
-                                  isSelected1 = false;
-                                  isSelected2 = false;
-                                  isSelected4 = false;
-                                  theme = PdfBrushes.purple;
-                                });
-                              }
+                            )),
+                        onTap: () {
+                          setState(() {
+                            isSelected2 = !isSelected2;
+                            isSelected1 = false;
+                            isSelected4 = false;
+                            isSelected3 = false;
+                            theme = PdfBrushes.teal;
+                          });
+                        }),
+                    GestureDetector(
+                        child: Container(
+                            margin: EdgeInsets.only(right: 2),
+                            padding:
+                                EdgeInsets.all(getProportionateScreenWidth(8)),
+                            height: getProportionateScreenWidth(40),
+                            width: getProportionateScreenWidth(40),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              border: Border.all(
+                                  color: isSelected3
+                                      ? primaryColor
+                                      : Colors.transparent),
+                              shape: BoxShape.circle,
                             ),
-                            GestureDetector(
-                              child: Container(
-                                  margin: EdgeInsets.only(right: 2),
-                                  padding: EdgeInsets.all(getProportionateScreenWidth(8)),
-                                  height: getProportionateScreenWidth(40),
-                                  width: getProportionateScreenWidth(40),
-                                  decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    border: Border.all(color: isSelected4 ? primaryColor : Colors.transparent),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFF00008B),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  )
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Color(0xFF800080),
+                                shape: BoxShape.circle,
                               ),
-                                onTap: () {
-                                setState(() {
-                                  isSelected4 = !isSelected4;
-                                  isSelected1 = false;
-                                  isSelected2 = false;
-                                  isSelected3 = false;
-                                  theme = PdfBrushes.darkBlue;
-                                });
-                              }
-                            )
-                          ]
-                        )
-                      ]
-                  )
-              ),
-              SizedBox(height: 40),
-              DefaultButton(
-                text: "Submit",
-                press: () {
-                  createPDF();
-                  return Scaffold(
-                    body: Center(
-                        child: LoadingBouncingGrid.circle(
-                          backgroundColor: primaryColor,
-                        )
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: SizeConfig.screenHeight * 0.03),
-            ],
-          ),
-        )
-      ),
+                            )),
+                        onTap: () {
+                          setState(() {
+                            isSelected3 = !isSelected3;
+                            isSelected1 = false;
+                            isSelected2 = false;
+                            isSelected4 = false;
+                            theme = PdfBrushes.purple;
+                          });
+                        }),
+                    GestureDetector(
+                        child: Container(
+                            margin: EdgeInsets.only(right: 2),
+                            padding:
+                                EdgeInsets.all(getProportionateScreenWidth(8)),
+                            height: getProportionateScreenWidth(40),
+                            width: getProportionateScreenWidth(40),
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              border: Border.all(
+                                  color: isSelected4
+                                      ? primaryColor
+                                      : Colors.transparent),
+                              shape: BoxShape.circle,
+                            ),
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Color(0xFF00008B),
+                                shape: BoxShape.circle,
+                              ),
+                            )),
+                        onTap: () {
+                          setState(() {
+                            isSelected4 = !isSelected4;
+                            isSelected1 = false;
+                            isSelected2 = false;
+                            isSelected3 = false;
+                            theme = PdfBrushes.darkBlue;
+                          });
+                        })
+                  ])
+                ])),
+            SizedBox(height: 40),
+            DefaultButton(
+              text: "Submit",
+              press: () {
+                createPDF();
+                return Scaffold(
+                  body: Center(
+                      child: LoadingBouncingGrid.circle(
+                    backgroundColor: primaryColor,
+                  )),
+                );
+              },
+            ),
+            SizedBox(height: SizeConfig.screenHeight * 0.03),
+          ],
+        ),
+      )),
     );
   }
 }
